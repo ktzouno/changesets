@@ -1,15 +1,21 @@
 import { Packages, Package } from "@manypkg/get-packages";
 import getDependencyGraph from "./get-dependency-graph";
+import { ExperimentalOptions } from "@changesets/types";
 
 export function getDependentsGraph(
   packages: Packages,
-  opts?: { bumpVersionsWithWorkspaceProtocolOnly?: boolean }
+  opts?: {
+    bumpVersionsWithWorkspaceProtocolOnly?: boolean;
+    ___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH?: ExperimentalOptions;
+  }
 ) {
   const graph: Map<string, { pkg: Package; dependents: string[] }> = new Map();
 
   const { graph: dependencyGraph } = getDependencyGraph(packages, {
     bumpVersionsWithWorkspaceProtocolOnly:
       opts?.bumpVersionsWithWorkspaceProtocolOnly === true,
+    ___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH:
+      opts?.___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH,
   });
 
   const dependentsLookup: {

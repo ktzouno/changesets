@@ -145,6 +145,8 @@ export async function run(
         const dependentsGraph = getDependentsGraph(packages, {
           bumpVersionsWithWorkspaceProtocolOnly:
             config.bumpVersionsWithWorkspaceProtocolOnly,
+          ___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH:
+            config.___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH,
         });
         for (const ignoredPackage of config.ignore) {
           const dependents = dependentsGraph.get(ignoredPackage) || [];

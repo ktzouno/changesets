@@ -2,7 +2,7 @@
 import semver from "semver";
 import chalk from "chalk";
 import { Packages, Package } from "@manypkg/get-packages";
-import { PackageJSON } from "@changesets/types";
+import { ExperimentalOptions, PackageJSON } from "@changesets/types";
 
 const DEPENDENCY_TYPES = [
   "dependencies",
@@ -52,6 +52,7 @@ export default function getDependencyGraph(
   packages: Packages,
   opts?: {
     bumpVersionsWithWorkspaceProtocolOnly?: boolean;
+    ___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH?: ExperimentalOptions;
   }
 ): {
   graph: Map<string, { pkg: Package; dependencies: Array<string> }>;
@@ -62,6 +63,9 @@ export default function getDependencyGraph(
     { pkg: Package; dependencies: Array<string> }
   >();
   let valid = true;
+  const updateInternalDependentsAlways =
+    opts?.___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH
+      ?.updateInternalDependents === "always";
 
   const packagesByName: { [key: string]: Package } = {
     [packages.root.packageJson.name]: packages.root,
@@ -100,14 +104,20 @@ export default function getDependencyGraph(
       const range = getValidRange(depRange);
 
       if ((range && !range.test(expected)) || isProtocolRange(depRange)) {
+        const errorMessage = `Package ${chalk.cyan(
+          `"${name}"`
+        )} must depend on the current version of ${chalk.cyan(
+          `"${depName}"`
+        )}: ${chalk.green(`"${expected}"`)} vs ${chalk.red(`"${depRange}"`)}`;
+
+        if (updateInternalDependentsAlways) {
+          console.warn(errorMessage);
+          dependencies.push(depName);
+          continue;
+        }
+
         valid = false;
-        console.error(
-          `Package ${chalk.cyan(
-            `"${name}"`
-          )} must depend on the current version of ${chalk.cyan(
-            `"${depName}"`
-          )}: ${chalk.green(`"${expected}"`)} vs ${chalk.red(`"${depRange}"`)}`
-        );
+        console.error(errorMessage);
         continue;
       }
 

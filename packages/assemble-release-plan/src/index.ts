@@ -179,6 +179,8 @@ function assembleReleasePlan(
   let dependencyGraph = getDependentsGraph(packages, {
     bumpVersionsWithWorkspaceProtocolOnly:
       refinedConfig.bumpVersionsWithWorkspaceProtocolOnly,
+    ___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH:
+      refinedConfig.___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH,
   });
 
   let releasesValidated = false;
